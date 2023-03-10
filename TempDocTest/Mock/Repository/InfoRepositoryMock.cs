@@ -29,15 +29,7 @@ namespace TempDocTest.Mock.Repository
             return Task.FromResult(_context.Data.Where(x => predicate(x)));
         }
 
-        public Task Upsert(List<StoredFileInfo> files)
-        {
-            foreach (var item in files)
-            {
-                Upsert(item);
-            }
-
-            return Task.CompletedTask;
-        }
+        public Task Insert(StoredFileInfo file) => Upsert(file);
 
         public Task Upsert(StoredFileInfo file, Expression<Func<StoredFileInfo, bool>> expression = null)
         {

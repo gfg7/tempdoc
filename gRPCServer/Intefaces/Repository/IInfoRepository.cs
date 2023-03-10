@@ -7,6 +7,7 @@ namespace gRPCServer.Intefaces.Repository
     {
         Task<long> DeleteFile(Expression<Func<TDoc, bool>> expression);
         Task<IEnumerable<TDoc>> GetAll(Expression<Func<TDoc, bool>> expression);
-        Task Upsert(TDoc file, Expression<Func<TDoc, bool>> expression=null);
+        Task Upsert(TDoc file, Expression<Func<TDoc, bool>> expression);
+        Task Insert(TDoc file);
     }
 }

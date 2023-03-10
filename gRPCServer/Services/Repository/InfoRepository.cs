@@ -20,12 +20,14 @@ namespace gRPCServer.Services.Repository
 
         public async Task<IEnumerable<TDoc>> GetAll(Expression<Func<TDoc, bool>> expression) => await (await _context.Collection.FindAsync<TDoc>(_filter.Where(expression))).ToListAsync();
 
-        public async Task Upsert(TDoc file, Expression<Func<TDoc, bool>> expression = null) =>
-         await _context.Collection.ReplaceOneAsync<TDoc>(expression,
-            file,
-            new ReplaceOptions() 
-            {
-                IsUpsert = true
-            });
+        public async Task Insert(TDoc file) => await _context.Collection.InsertOneAsync(file);
+
+        public async Task Upsert(TDoc file, Expression<Func<TDoc, bool>> expression) => await _context.Collection.ReplaceOneAsync<TDoc>(
+                   expression,
+                   file,
+                   new ReplaceOptions()
+                   {
+                       IsUpsert = true
+                   });
     }
 }
