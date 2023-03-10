@@ -1,5 +1,4 @@
 ﻿using gRPCServer.Intefaces.Services;
-using gRPCServer.Services.Management;
 using Quartz;
 
 namespace gRPCServer.Jobs
