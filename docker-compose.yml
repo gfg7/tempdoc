@@ -1,0 +1,43 @@
+version: '3.4'
+
+services:
+  grpcserver:
+    image: ${DOCKER_REGISTRY-}grpcserver
+    build:
+      context: .
+      dockerfile: gRPCServer/Dockerfile
+    container_name: grpcserver
+    env_file: server.env
+    ports:
+    - 6510:80
+    networks:
+        - tempdoc
+    environment:
+        MONGO_SERVER: mongo
+    depends_on:
+        mongo:
+            condition: service_healthy
+    healthcheck:
+       test: curl --false http://grpcserver:6510/heath || exit
+       interval: 10s
+       retries: 5
+       timeout: 5s
+       start_period: 30s
+  mongo:
+    image:  mongo:4.4.17-focal
+    container_name: mongo
+    restart: unless-stopped
+    env_file: mongo.env
+    ports:
+    - 27017:27017
+    networks:
+        - tempdoc
+    healthcheck:
+        test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+        interval: 10s
+        timeout: 5s
+        retries: 5
+        start_period: 30s
+networks:
+  tempdoc:
+    driver: bridge

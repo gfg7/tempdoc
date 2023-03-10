@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
+    <DockerComposeProjectPath>docker-compose.dcproj</DockerComposeProjectPath>
+    <UserSecretsId>82d8f81f-83ce-43be-b8b4-3875e3d14818</UserSecretsId>
+  </PropertyGroup>
+
+  <PropertyGroup>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+</PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.22.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.51.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.52.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Grpc.Swagger" Version="0.3.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
+    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.19.0" />
+    <PackageReference Include="Quartz" Version="3.6.2" />
+    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.6.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
+  </ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Models\**" />
+	  <Content Remove="Models\**" />
+	  <EmbeddedResource Remove="Models\**" />
+	  <None Remove="Models\**" />
+	  <Protobuf Remove="Models\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\gRPCContract\gRPCContract.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="..\gRPCContract\Protos\*.proto" GrpcServices="Server" />
+	</ItemGroup>
+
+</Project>

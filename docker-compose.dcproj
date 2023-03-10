@@ -1,0 +1,17 @@
+<Project ToolsVersion="15.0" Sdk="Microsoft.Docker.Sdk">
+  <PropertyGroup Label="Globals">
+    <ProjectVersion>2.1</ProjectVersion>
+    <DockerTargetOS>Linux</DockerTargetOS>
+    <ProjectGuid>f7dbaaef-618b-4874-bd1c-58b22acc7929</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="docker-compose.override.yml">
+      <DependentUpon>docker-compose.yml</DependentUpon>
+    </None>
+    <None Include="docker-compose.yml" />
+    <None Include=".dockerignore" />
+    <None Include="gateway.env" />
+    <None Include="mongo.env" />
+    <None Include="server.env" />
+  </ItemGroup>
+</Project>

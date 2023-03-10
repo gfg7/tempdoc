@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+option csharp_namespace = "gRPCContract.Protos";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+
+package TempDocSaver;
+
+service TempDocSaver {
+
+  rpc GetFile (BucketFileQuery) returns (stream File);
+
+  rpc UploadFiles (stream BucketUpload) returns (BucketContent);
+
+  rpc SetExtraSettings (FileExtra) returns (FileInfo){
+    option (google.api.http) = {
+      put: "/api/{base_info.bucket_base.name}/files/{base_info.file_base.code}",
+      body: "extra"
+    };
+  }
+
+  rpc GetBucket (BucketBase) returns (stream BucketContent){
+    option (google.api.http) = {
+      get: "/api/{name}/files"
+    };
+  }
+}
+
+//base
+message BucketBase {
+	string name = 1;
+}
+
+message FileBase {
+	string code = 1;
+}
+
+message Extra{
+  google.protobuf.Int32Value keep_for = 1;
+  optional google.protobuf.StringValue description = 2;
+}
+
+//request
+message BucketFileQuery {
+    BucketBase bucket_base = 1;
+    FileBase file_base =2;
+}
+
+message FileExtra {
+    Extra extra = 1;
+    BucketFileQuery base_info = 2;
+}
+
+message BucketUpload {
+   BucketBase bucket_base = 1;
+   repeated File file = 2;
+}
+
+message File {
+	bytes file = 1;
+  string filename =2;
+}
+//response
+message FileInfo {
+    FileBase file_base =1;
+    string filename =2;
+    sint64 size =3;
+    google.protobuf.Timestamp upload_date = 4;
+    google.protobuf.Timestamp expire_date = 5;
+    google.protobuf.StringValue description = 6;
+}
+
+message BucketContent {
+   BucketBase bucket_base = 1;
+   repeated FileInfo stored = 2;
+}
