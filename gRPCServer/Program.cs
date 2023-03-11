@@ -17,6 +17,10 @@ using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddConsole();
+
+builder.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+
 builder.Services.AddHealthChecks();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -26,8 +30,6 @@ builder.Services.AddSingleton<ErrorHandler>();
 builder.Services.AddGrpc(o =>
 {
     o.EnableDetailedErrors = builder.Environment.IsDevelopment();
-
-    o.EnableDetailedErrors = false;
 
     o.Interceptors.Add<GrpcErrorHandler>();
     o.IgnoreUnknownServices = false;
@@ -75,7 +77,6 @@ builder.Services.AddQuartz(t =>
     t.AddTrigger(q =>
     {
         q.ForJob(nameof(DropExpiredJob));
-        // q.WithCronSchedule("0 */15 * ? * *");
         q.WithCronSchedule(Env.Get("CRON_FLUSH_EXPIRED"));
     });
 });
@@ -122,12 +123,5 @@ app.MapGet("/api/{bucket}/{code}", async (
 }).WithTags("TempDocSaver");
 
 app.MapGrpcService<TempDocSaverHandler>();
-
-app.UseResponseCaching();
-
-// app.UseCors(o =>
-// {
-
-// });
 
 app.Run();
