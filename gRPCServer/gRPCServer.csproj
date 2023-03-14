@@ -15,8 +15,6 @@
 </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.22.0" />
-    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.51.0" />
     <PackageReference Include="Grpc.Tools" Version="2.52.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -44,7 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="..\gRPCContract\Protos\*.proto" GrpcServices="Server" />
+		<Protobuf Include="..\gRPCContract\Protos\*" GrpcServices="Server" />
 	</ItemGroup>
 
 </Project>
