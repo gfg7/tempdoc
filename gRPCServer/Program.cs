@@ -12,6 +12,7 @@ using gRPCServer.Services.Management;
 using gRPCServer.Services.ProtosHandler;
 using gRPCServer.Services.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using Quartz;
 
@@ -39,6 +40,29 @@ builder.Services.AddGrpc(o =>
 builder.Services.AddGrpcSwagger();
 builder.Services.AddSwaggerGen(c =>
 {
+    var jwtSecurityScheme = new OpenApiSecurityScheme
+    {
+        BearerFormat = "JWT",
+        Name = "JWT Authentication",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
+
+        Reference = new OpenApiReference
+        {
+            Id = "Bearer",
+            Type = ReferenceType.SecurityScheme
+        }
+    };
+
+    c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { jwtSecurityScheme, Array.Empty<string>() }
+    });
+
     c.SwaggerDoc(
         "v1",
         new Microsoft.OpenApi.Models.OpenApiInfo()
@@ -116,7 +140,7 @@ app.MapGet("/api/{bucket}/{code}", async (
     [FromRoute] string code,
     IClientBucketManagement service) =>
 {
-    var (filename, file) =await service.GetFile(bucket, code);
+    var (filename, file) = await service.GetFile(bucket, code);
     file.Position = 0;
     return Results.Stream(file, "application/octet-stream", filename);
 }).WithTags("TempDocSaver");
