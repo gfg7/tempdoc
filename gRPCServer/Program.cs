@@ -11,6 +11,7 @@ using gRPCServer.Services.ErrorHandling;
 using gRPCServer.Services.Management;
 using gRPCServer.Services.ProtosHandler;
 using gRPCServer.Services.Repository;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
@@ -22,13 +23,15 @@ builder.Services.AddHealthChecks();
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddOutputCache();
+
+builder.Services.AddCors();
+
 builder.Services.AddSingleton<ErrorHandler>();
 
 builder.Services.AddGrpc(o =>
 {
     o.EnableDetailedErrors = builder.Environment.IsDevelopment();
-
-    o.EnableDetailedErrors = false;
 
     o.Interceptors.Add<GrpcErrorHandler>();
     o.IgnoreUnknownServices = false;
@@ -38,38 +41,22 @@ builder.Services.AddGrpc(o =>
 }).AddJsonTranscoding();
 
 builder.Services.AddGrpcSwagger();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
 builder.Services.AddSwaggerGen(c =>
 {
-    var jwtSecurityScheme = new OpenApiSecurityScheme
-    {
-        BearerFormat = "JWT",
-        Name = "JWT Authentication",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
-
-        Reference = new OpenApiReference
-        {
-            Id = "Bearer",
-            Type = ReferenceType.SecurityScheme
-        }
-    };
-
-    c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { jwtSecurityScheme, Array.Empty<string>() }
-    });
-
     c.SwaggerDoc(
         "v1",
         new Microsoft.OpenApi.Models.OpenApiInfo()
         {
             Title = "TempDocSaver",
             Version = "v1",
-            Description = "gRPC transcoding API for web clients of TempDocSaver"
+            Description = "API for web clients of TempDocSaver"
         }
     );
 });
@@ -99,7 +86,6 @@ builder.Services.AddQuartz(t =>
     t.AddTrigger(q =>
     {
         q.ForJob(nameof(DropExpiredJob));
-        // q.WithCronSchedule("0 */15 * ? * *");
         q.WithCronSchedule(Env.Get("CRON_FLUSH_EXPIRED"));
     });
 });
@@ -113,9 +99,20 @@ var app = builder.Build();
 
 app.UseMiddleware<WebErrorHandler>();
 
-if (builder.Environment.IsDevelopment())
+  app.UseForwardedHeaders();
+  app.UseRouting();
+
+if (builder.Environment.IsDevelopment() || bool.Parse(Env.Get("SHOW_API")))
 {
-    app.UseSwagger();
+    app.UseSwagger(o=> {
+        o.PreSerializeFilters.Add((swagger, request) =>
+        {
+            swagger.Servers.Add(new()
+            {
+                Url = $"{request.Scheme}://{request.Host.Value}/{request.Headers["X-Forwarded-Prefix"]}"
+            });
+        });
+    });
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1");
@@ -143,15 +140,26 @@ app.MapGet("/api/{bucket}/{code}", async (
     var (filename, file) = await service.GetFile(bucket, code);
     file.Position = 0;
     return Results.Stream(file, "application/octet-stream", filename);
-}).WithTags("TempDocSaver");
+}).WithTags("TempDocSaver")
+.CacheOutput(o =>
+{
+    if (int.TryParse(Env.Get("CACHE_LIFETIME"), out int cache) && cache is not 0)
+    {
+        o.Cache();
+        o.Expire(TimeSpan.FromMinutes(cache));
+    } else {
+        o.NoCache();
+    }
+});
 
-app.MapGrpcService<TempDocSaverHandler>();
+app.MapGrpcService<TempDocSaverHandler>().RequireHost(Env.Get("GRPC_REQ_HOST"));
 
-app.UseResponseCaching();
+app.UseOutputCache();
 
-// app.UseCors(o =>
-// {
-
-// });
+app.UseCors(x=> {
+    x.AllowAnyHeader();
+    x.AllowAnyMethod();
+    x.AllowAnyOrigin();
+});
 
 app.Run();
