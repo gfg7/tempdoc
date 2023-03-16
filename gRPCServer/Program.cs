@@ -78,7 +78,7 @@ builder.Services.AddQuartz(t =>
     var key = nameof(DropExpiredJob);
     t.AddJob<DropExpiredJob>(o =>
     {
-        o.DisallowConcurrentExecution(false);
+        o.DisallowConcurrentExecution(true);
         o.WithIdentity(key);
         o.RequestRecovery(true);
     });
@@ -88,6 +88,12 @@ builder.Services.AddQuartz(t =>
         q.ForJob(nameof(DropExpiredJob));
         q.WithCronSchedule(Env.Get("CRON_FLUSH_EXPIRED"));
     });
+});
+
+builder.Services.AddQuartzHostedService(o=> {
+    o.AwaitApplicationStarted = true;
+    o.StartDelay = null;
+    o.WaitForJobsToComplete = true;
 });
 
 builder.WebHost.ConfigureKestrel(o =>

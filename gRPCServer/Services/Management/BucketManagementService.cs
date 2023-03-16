@@ -85,7 +85,7 @@ namespace gRPCServer.Services.Management
 
                 var info = new StoredFileInfo().MapInfoFromFile(bucket, file, id.ToString());
 
-                await _infoRepository.Upsert(info);
+                await _infoRepository.Insert(info);
             }
 
             return await GetBucket(bucket);
