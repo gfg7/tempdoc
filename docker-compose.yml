@@ -9,20 +9,42 @@ services:
     container_name: grpcserver
     env_file: server.env
     ports:
-    - 6510:80
+    - 80
+    - 81
     networks:
-        - tempdoc
+    - tempdoc
     environment:
         MONGO_SERVER: mongo
     depends_on:
         mongo:
             condition: service_healthy
     healthcheck:
-       test: curl --false http://grpcserver:6510/heath || exit
+       test: curl --false http://grpcserver:80/swagger/index.html || exit
        interval: 10s
        retries: 5
        timeout: 5s
        start_period: 30s
+  balancer:
+      image: nginx:stable-alpine
+      container_name: nginx
+      ports:
+      - 8181:80
+      networks:
+      - tempdoc
+      env_file: nginx.env
+      external_links:
+      - grpcserver
+      volumes:
+      - ./nginx/variables.template:/etc/nginx/templates/variables.template:ro
+      - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template:rw
+      # depends_on:
+      #     grpcserver:
+      #         condition: service_healthy
+      # healthcheck:
+      #   test: curl --false http://nginx:8080 || exit
+      #   interval: 10s
+      #   retries: 5
+      #   timeout: 5s
   mongo:
     image:  mongo:4.4.17-focal
     container_name: mongo
@@ -31,7 +53,7 @@ services:
     ports:
     - 27017:27017
     networks:
-        - tempdoc
+    - tempdoc
     healthcheck:
         test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
         interval: 10s

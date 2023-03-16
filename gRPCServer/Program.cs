@@ -11,7 +11,9 @@ using gRPCServer.Services.ErrorHandling;
 using gRPCServer.Services.Management;
 using gRPCServer.Services.ProtosHandler;
 using gRPCServer.Services.Repository;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using Quartz;
 
@@ -29,6 +31,10 @@ builder.Services.AddHealthChecks();
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddOutputCache();
+
+builder.Services.AddCors();
+
 builder.Services.AddSingleton<ErrorHandler>();
 
 builder.Services.AddGrpc(o =>
@@ -43,6 +49,13 @@ builder.Services.AddGrpc(o =>
 }).AddJsonTranscoding();
 
 builder.Services.AddGrpcSwagger();
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                     ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc(
@@ -51,7 +64,7 @@ builder.Services.AddSwaggerGen(c =>
         {
             Title = "TempDocSaver",
             Version = "v1",
-            Description = "gRPC transcoding API for web clients of TempDocSaver"
+            Description = "API for web clients of TempDocSaver"
         }
     );
 });
@@ -102,9 +115,20 @@ app.UseHttpLogging();
 
 app.UseMiddleware<WebErrorHandler>();
 
-if (builder.Environment.IsDevelopment())
+  app.UseForwardedHeaders();
+  app.UseRouting();
+
+if (builder.Environment.IsDevelopment() || bool.Parse(Env.Get("SHOW_API")))
 {
-    app.UseSwagger();
+    app.UseSwagger(o=> {
+        o.PreSerializeFilters.Add((swagger, request) =>
+        {
+            swagger.Servers.Add(new()
+            {
+                Url = $"{request.Scheme}://{request.Host.Value}/{request.Headers["X-Forwarded-Prefix"]}"
+            });
+        });
+    });
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "V1");
@@ -129,11 +153,29 @@ app.MapGet("/api/{bucket}/{code}", async (
     [FromRoute] string code,
     IClientBucketManagement service) =>
 {
-    var (filename, file) =await service.GetFile(bucket, code);
+    var (filename, file) = await service.GetFile(bucket, code);
     file.Position = 0;
     return Results.Stream(file, "application/octet-stream", filename);
-}).WithTags("TempDocSaver");
+}).WithTags("TempDocSaver")
+.CacheOutput(o =>
+{
+    if (int.TryParse(Env.Get("CACHE_LIFETIME"), out int cache) && cache is not 0)
+    {
+        o.Cache();
+        o.Expire(TimeSpan.FromMinutes(cache));
+    } else {
+        o.NoCache();
+    }
+});
 
-app.MapGrpcService<TempDocSaverHandler>();
+app.MapGrpcService<TempDocSaverHandler>().RequireHost(Env.Get("GRPC_REQ_HOST"));
+
+app.UseOutputCache();
+
+app.UseCors(x=> {
+    x.AllowAnyHeader();
+    x.AllowAnyMethod();
+    x.AllowAnyOrigin();
+});
 
 app.Run();
