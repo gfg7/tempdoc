@@ -35,7 +35,8 @@ services:
       external_links:
       - grpcserver
       volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/variables.template:/etc/nginx/templates/variables.template:ro
+      - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template:rw
       # depends_on:
       #     grpcserver:
       #         condition: service_healthy
