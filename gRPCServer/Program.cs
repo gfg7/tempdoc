@@ -168,7 +168,7 @@ app.MapGet("/api/{bucket}/{code}", async (
     }
 });
 
-app.MapGrpcService<TempDocSaverHandler>().RequireHost(Env.Get("GRPC_REQ_HOST"));
+app.MapGrpcService<TempDocSaverHandler>();
 
 app.UseOutputCache();
 
