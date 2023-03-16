@@ -1,7 +1,17 @@
+using System.Runtime.InteropServices.ComTypes;
 using MongoDB.Driver;
 
-namespace gRPCServer.Services.ErrorHandling {
-    public class ErrorHandler {
+namespace gRPCServer.Services.ErrorHandling
+{
+    public class ErrorHandler
+    {
+        private readonly ILogger _logger;
+
+        public ErrorHandler(ILogger<ErrorHandler> logger)
+        {
+            _logger = logger;
+        }
+        
         public async Task<TResponse> MapErrorMessage<TResponse>(Func<Task<object>> service)
          where TResponse : class
         {
@@ -11,17 +21,24 @@ namespace gRPCServer.Services.ErrorHandling {
             }
             catch (System.Exception ex)
             {
-                var message = ex.Message;
+                var message = string.Empty;
+                var level = LogLevel.Critical;
 
-                if (ex is TimeoutException )
+                switch (ex)
                 {
-                    message = "Execution timeout\nSomething wrong with db availability";
+                    case TimeoutException:
+                        message = "Execution timeout. Something wrong with db availability";
+                        break;
+                    case MongoConnectionException:
+                        message = "Connection failure. Check your client credentials and call out to our support";
+                        break;
+                    default:
+                        level = LogLevel.Error;
+                        message = ex.Message;
+                        break;
                 }
 
-                if (ex is MongoConnectionException)
-                {
-                    message = "Connection failure\nCheck your client credentials and call out to our support";
-                }
+                _logger.Log(level, ex, message, service.Method.GetParameters());
 
                 throw new Exception(message);
             }

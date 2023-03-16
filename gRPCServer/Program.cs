@@ -17,6 +17,14 @@ using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpLogging(o=> {
+    o.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestProperties;
+});
+
+builder.Logging.AddConsole();
+
+builder.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+
 builder.Services.AddHealthChecks();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -26,8 +34,6 @@ builder.Services.AddSingleton<ErrorHandler>();
 builder.Services.AddGrpc(o =>
 {
     o.EnableDetailedErrors = builder.Environment.IsDevelopment();
-
-    o.EnableDetailedErrors = false;
 
     o.Interceptors.Add<GrpcErrorHandler>();
     o.IgnoreUnknownServices = false;
@@ -91,6 +97,8 @@ builder.WebHost.ConfigureKestrel(o =>
 });
 
 var app = builder.Build();
+
+app.UseHttpLogging();
 
 app.UseMiddleware<WebErrorHandler>();
 
