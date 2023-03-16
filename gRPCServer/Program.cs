@@ -17,6 +17,10 @@ using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpLogging(o=> {
+    o.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestProperties;
+});
+
 builder.Logging.AddConsole();
 
 builder.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
@@ -87,6 +91,8 @@ builder.WebHost.ConfigureKestrel(o =>
 });
 
 var app = builder.Build();
+
+app.UseHttpLogging();
 
 app.UseMiddleware<WebErrorHandler>();
 
