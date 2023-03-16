@@ -4,12 +4,12 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "composeLaunchAction": "LaunchBrowser",
-      "composeLaunchServiceName": "restgateway",
+      "composeLaunchServiceName": "tempdoc",
       "composeLaunchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
       "serviceActions": {
         "grpcserver": "StartDebugging",
         "mongo": "StartWithoutDebugging",
-        "restgateway": "StartDebugging"
+        "nginx": "StartWithoutDebugging"
       }
     }
   }
