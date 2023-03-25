@@ -13,7 +13,6 @@ using gRPCServer.Services.ProtosHandler;
 using gRPCServer.Services.Repository;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using Quartz;
 
@@ -135,7 +134,7 @@ if (builder.Environment.IsDevelopment() || bool.Parse(Env.Get("SHOW_API")))
     });
 }
 
-app.MapHealthChecks("/heath", new()
+app.MapHealthChecks("/health", new()
 {
     AllowCachingResponses = false
 });

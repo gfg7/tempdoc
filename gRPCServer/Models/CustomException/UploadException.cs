@@ -1,5 +1,6 @@
 ﻿
-namespace gRPCContract.Models.ErrorModel
+namespace gRPCServer.Models.CustomException
+
 {
     public class UploadException : Exception
     {

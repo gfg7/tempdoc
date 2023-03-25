@@ -19,7 +19,7 @@ services:
         mongo:
             condition: service_healthy
     healthcheck:
-       test: curl --false http://grpcserver:80/swagger/index.html || exit
+       test: curl --false http://grpcserver:80/health || exit
        interval: 10s
        retries: 5
        timeout: 5s
@@ -37,14 +37,14 @@ services:
       volumes:
       - ./nginx/variables.template:/etc/nginx/templates/variables.template:ro
       - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template:rw
-      # depends_on:
-      #     grpcserver:
-      #         condition: service_healthy
-      # healthcheck:
-      #   test: curl --false http://nginx:8080 || exit
-      #   interval: 10s
-      #   retries: 5
-      #   timeout: 5s
+      depends_on:
+          grpcserver:
+              condition: service_healthy
+      healthcheck:
+        test: curl --false http://nginx:8080 || exit
+        interval: 10s
+        retries: 5
+        timeout: 5s
   mongo:
     image:  mongo:4.4.17-focal
     container_name: mongo

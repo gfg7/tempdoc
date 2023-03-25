@@ -1,7 +1,4 @@
-﻿using System.Linq.Expressions;
-using System;
-using gRPCContract.Interfaces;
-using gRPCContract.Models.ErrorModel;
+﻿using gRPCContract.Interfaces;
 using gRPCContract.Models.Request;
 using gRPCContract.Models.Stored;
 using gRPCServer.Intefaces.Repository;
@@ -9,6 +6,7 @@ using gRPCServer.Intefaces.Services;
 using gRPCServer.Mappers;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using gRPCServer.Models.CustomException;
 
 namespace gRPCServer.Services.Management
 {
