@@ -24,6 +24,27 @@ services:
        retries: 5
        timeout: 5s
        start_period: 30s
+  grpcclient:
+    image: ${DOCKER_REGISTRY-}tempdocclient
+    build:
+      context: .
+      dockerfile: TempDocClient/Dockerfile
+    container_name: grpcclient
+    ports:
+    - 80
+    networks:
+    - tempdoc
+    environment:
+        TEMPDOC_HOST: grpcserver
+    depends_on:
+        grpcserver:
+            condition: service_healthy
+    # healthcheck:
+    #    test: curl --false http://grpcserver:80/swagger/index.html || exit
+    #    interval: 10s
+    #    retries: 5
+    #    timeout: 5s
+    #    start_period: 30s
   balancer:
       image: nginx:stable-alpine
       container_name: nginx
