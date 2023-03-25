@@ -1,6 +1,6 @@
-using gRPCContract.Models.ErrorModel;
 using gRPCContract.Models.Request;
 using gRPCContract.Utils;
+using gRPCServer.Models.CustomException;
 using gRPCServer.Services.Management;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
