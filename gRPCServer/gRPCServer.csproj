@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -9,11 +8,9 @@
     <DockerComposeProjectPath>docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>82d8f81f-83ce-43be-b8b4-3875e3d14818</UserSecretsId>
   </PropertyGroup>
-
   <PropertyGroup>
-  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-</PropertyGroup>
-
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Grpc.Tools" Version="2.52.0">
       <PrivateAssets>all</PrivateAssets>
@@ -29,13 +26,10 @@
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.6.2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
   </ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\gRPCContract\gRPCContract.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Protobuf Include="..\gRPCContract\Protos\*" GrpcServices="Server" />
-	</ItemGroup>
-
+  <ItemGroup>
+    <Protobuf Include="..\ProtoContract\*" GrpcServices="Server" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebContract\WebContract.csproj" />
+  </ItemGroup>
 </Project>

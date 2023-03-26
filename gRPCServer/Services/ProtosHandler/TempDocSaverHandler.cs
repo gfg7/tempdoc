@@ -1,13 +1,10 @@
-﻿using System.IO;
-using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
+﻿using Google.Protobuf;
 using Grpc.Core;
-using gRPCContract.Interfaces;
-using gRPCContract.Protos;
-using File=gRPCContract.Protos.File;
-using FileInfo=gRPCContract.Protos.FileInfo;
 using gRPCServer.Mappers;
-using gRPCContract.Models.Stored;
+using ProtoContract.Protos;
+using WebContract.Interfaces;
+using File = ProtoContract.Protos.File;
+using FileInfo = ProtoContract.Protos.FileInfo;
 
 namespace gRPCServer.Services.ProtosHandler
 {

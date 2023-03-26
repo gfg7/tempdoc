@@ -1,8 +1,8 @@
-﻿using gRPCContract.Models.Request;
-using gRPCContract.Models.Stored;
+using WebContract.Models.Request;
+using WebContract.Models.Stored;
 using Microsoft.AspNetCore.Http;
 
-namespace gRPCContract.Interfaces
+namespace WebContract.Interfaces
 {
     public interface IClientBucketManagement
     {

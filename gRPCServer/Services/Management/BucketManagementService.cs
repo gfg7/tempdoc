@@ -1,12 +1,12 @@
-﻿using gRPCContract.Interfaces;
-using gRPCContract.Models.Request;
-using gRPCContract.Models.Stored;
-using gRPCServer.Intefaces.Repository;
+﻿using gRPCServer.Intefaces.Repository;
 using gRPCServer.Intefaces.Services;
 using gRPCServer.Mappers;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using gRPCServer.Models.CustomException;
+using WebContract.Interfaces;
+using WebContract.Models.Stored;
+using WebContract.Models.Request;
 
 namespace gRPCServer.Services.Management
 {

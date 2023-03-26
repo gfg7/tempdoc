@@ -1,4 +1,4 @@
-﻿namespace gRPCContract.Utils
+namespace gRPCServer.Services.Utils 
 {
     public static class Env
     {

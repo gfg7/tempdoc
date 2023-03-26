@@ -1,12 +1,12 @@
 ﻿using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using gRPCContract.Models.Request;
-using gRPCContract.Models.Stored;
-using gRPCContract.Protos;
-using gRPCContract.Utils;
 using MongoDB.Driver;
-using FileInfo = gRPCContract.Protos.FileInfo;
-using File = gRPCContract.Protos.File;
+using WebContract.Models.Stored;
+using gRPCServer.Services.Utils;
+using WebContract.Models.Request;
+using ProtoContract.Protos;
+using File = ProtoContract.Protos.File;
+using FileInfo = ProtoContract.Protos.FileInfo;
 
 namespace gRPCServer.Mappers
 {
