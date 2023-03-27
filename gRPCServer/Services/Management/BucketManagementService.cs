@@ -7,6 +7,7 @@ using gRPCServer.Models.CustomException;
 using WebContract.Interfaces;
 using WebContract.Models.Stored;
 using WebContract.Models.Request;
+using gRPCServer.Mappers.Extension;
 
 namespace gRPCServer.Services.Management
 {
@@ -81,7 +82,7 @@ namespace gRPCServer.Services.Management
 
                 var id = await _filesRepository.Upsert(file.FileName, stream);
 
-                var info = new StoredFileInfo().MapInfoFromFile(bucket, file, id.ToString());
+                var info = new StoredFileInfo().FromFile(bucket, file, id.ToString());
 
                 await _infoRepository.Insert(info);
             }
