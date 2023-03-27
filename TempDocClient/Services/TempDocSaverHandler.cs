@@ -1,9 +1,10 @@
 using Grpc.Core;
-using gRPCContract.Interfaces;
-using gRPCContract.Models.Request;
-using gRPCContract.Models.Stored;
-using gRPCContract.Protos;
-using File = gRPCContract.Protos.File;
+using ProtoContract.Protos;
+using TempDocClient.Mappers.Extensions;
+using WebContract.Interfaces;
+using WebContract.Models.Request;
+using WebContract.Models.Stored;
+using File = ProtoContract.Protos.File;
 
 namespace TempDocClient.Services
 {
@@ -23,12 +24,18 @@ namespace TempDocClient.Services
                 Name = bucket
             }).ResponseStream;
 
+            var result = new List<StoredFileInfo>();
 
+            while (await stream.MoveNext())
+            {
+                var stored = stream.Current.Stored;
+                result.AddRange(stored.Select(x=> x.FromProto(bucket)));
+            }
 
-            return null;
+            return result;
         }
 
-        public Task<(string, MemoryStream)> GetFile(string bucket, string code)
+        public async Task<(string, MemoryStream)> GetFile(string bucket, string code)
         {
             var stream = _client.GetFile(new BucketFileQuery()
             {
@@ -42,27 +49,38 @@ namespace TempDocClient.Services
                 }
             }).ResponseStream;
 
+            MemoryStream content = null;
+            string filename = string.Empty;
 
+            while (await stream.MoveNext())
+            {
+                content = new MemoryStream(stream.Current.File_.ToByteArray());
+                filename = stream.Current.Filename;
+            }
 
-            return null;
+            return (filename, content);
         }
 
-        public Task<StoredFileInfo> SetExtraSettings(string code, FileDtoRequest extra)
+        public async Task<StoredFileInfo> SetExtraSettings(string bucket, string code, FileDtoRequest extra)
         {
-            var result = _client.SetExtraSettingsAsync(new FileExtra() {
-                BaseInfo = new BucketFileQuery() {
+            var result = await _client.SetExtraSettingsAsync(new FileExtra()
+            {
+                BaseInfo = new BucketFileQuery()
+                {
                     BucketBase = null,
-                    FileBase = new FileBase() {
+                    FileBase = new FileBase()
+                    {
                         Code = code
                     }
                 },
-                Extra = new Extra() {
+                Extra = new Extra()
+                {
                     KeepFor = extra.KeepFor,
                     Description = extra.Description
                 }
             });
 
-            return null;
+            return result.FromProto(bucket);
         }
 
         public async Task<List<StoredFileInfo>> UploadFiles(string bucket, IFormFileCollection files)
@@ -89,10 +107,11 @@ namespace TempDocClient.Services
             }
 
             await call.RequestStream.CompleteAsync();
-
             var result = await call.ResponseAsync;
 
-            return null;
+            var storedInfo = result.Stored.Select(x => x.FromProto(bucket));
+
+            return storedInfo.ToList();
         }
     }
 }

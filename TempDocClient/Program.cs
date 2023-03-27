@@ -1,12 +1,11 @@
-using gRPCContract.Interfaces;
-using gRPCContract.Protos;
-using gRPCContract.Utils;
+using ProtoContract.Protos;
 using TempDocClient.Services;
+using WebContract.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddGrpcClient<TempDocSaver.TempDocSaverClient>(o=> {
-    o.Address = new Uri(Env.Get("TEMPDOC_HOST"));
+    o.Address = new Uri(Environment.GetEnvironmentVariable("TEMPDOC_HOST"));
 });
 builder.Services.AddControllersWithViews();
 
