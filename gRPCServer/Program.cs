@@ -1,6 +1,3 @@
-using gRPCContract.Interfaces;
-using gRPCContract.Models.Stored;
-using gRPCContract.Utils;
 using gRPCServer.Intefaces.DB;
 using gRPCServer.Intefaces.Repository;
 using gRPCServer.Intefaces.Services;
@@ -11,10 +8,13 @@ using gRPCServer.Services.ErrorHandling;
 using gRPCServer.Services.Management;
 using gRPCServer.Services.ProtosHandler;
 using gRPCServer.Services.Repository;
+using gRPCServer.Services.Utils;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Quartz;
+using WebContract.Interfaces;
+using WebContract.Models.Stored;
 
 var builder = WebApplication.CreateBuilder(args);
 
