@@ -1,6 +1,6 @@
-﻿using gRPCContract.Utils;
-using gRPCServer.Intefaces.DB;
+﻿using gRPCServer.Intefaces.DB;
 using gRPCServer.Intefaces.Repository;
+using gRPCServer.Services.Utils;
 using MongoDB.Bson;
 using MongoDB.Driver.GridFS;
 

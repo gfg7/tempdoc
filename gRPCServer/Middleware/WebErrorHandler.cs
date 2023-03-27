@@ -1,4 +1,4 @@
-﻿using gRPCContract.Models.ErrorModel;
+﻿using gRPCServer.Models.CustomException;
 using gRPCServer.Services.ErrorHandling;
 using MongoDB.Driver;
 

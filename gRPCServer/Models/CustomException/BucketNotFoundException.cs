@@ -1,5 +1,5 @@
 ﻿
-namespace gRPCContract.Models.ErrorModel
+namespace gRPCServer.Models.CustomException
 {
     public class BucketNotFoundException : Exception
     {

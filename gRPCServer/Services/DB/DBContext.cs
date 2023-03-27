@@ -1,7 +1,7 @@
-﻿using gRPCContract.Models.Stored;
-using gRPCContract.Utils;
-using gRPCServer.Intefaces.DB;
+﻿using gRPCServer.Intefaces.DB;
+using gRPCServer.Services.Utils;
 using MongoDB.Driver;
+using WebContract.Models.Stored;
 
 namespace gRPCServer.Services.DB
 {

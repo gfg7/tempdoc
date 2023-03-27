@@ -1,6 +1,6 @@
-﻿using gRPCContract.Models.Request;
+using WebContract.Models.Request;
 
-namespace gRPCContract.Models.Stored
+namespace WebContract.Models.Stored
 {
     public record StoredFileInfo : FileDtoRequest
     {

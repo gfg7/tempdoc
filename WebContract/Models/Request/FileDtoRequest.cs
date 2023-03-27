@@ -1,5 +1,5 @@
-﻿
-namespace gRPCContract.Models.Request
+
+namespace WebContract.Models.Request
 {
     public record FileDtoRequest
     {

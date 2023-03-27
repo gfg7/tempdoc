@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "gRPCContract.Protos";
+option csharp_namespace = "ProtoContract.Protos";
 
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";

@@ -1,13 +1,11 @@
-﻿using System.IO;
-using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
+﻿using Google.Protobuf;
 using Grpc.Core;
-using gRPCContract.Interfaces;
-using gRPCContract.Protos;
-using File=gRPCContract.Protos.File;
-using FileInfo=gRPCContract.Protos.FileInfo;
 using gRPCServer.Mappers;
-using gRPCContract.Models.Stored;
+using gRPCServer.Mappers.Extension;
+using ProtoContract.Protos;
+using WebContract.Interfaces;
+using File = ProtoContract.Protos.File;
+using FileInfo = ProtoContract.Protos.FileInfo;
 
 namespace gRPCServer.Services.ProtosHandler
 {
@@ -45,7 +43,7 @@ namespace gRPCServer.Services.ProtosHandler
 
             var result = await _service.UploadFiles(bucket, files);
 
-            return Mapper.ToProto(result);
+            return result.ToProto();
         }
 
         public override async Task GetFile(BucketFileQuery request, IServerStreamWriter<File> responseStream, ServerCallContext context)
@@ -65,17 +63,17 @@ namespace gRPCServer.Services.ProtosHandler
         {
             var bucket = await _service.GetBucket(request.Name);
             
-            await responseStream.WriteAsync(Mapper.ToProto(bucket));
+            await responseStream.WriteAsync(bucket.ToProto());
         }
 
         public override async Task<FileInfo> SetExtraSettings(FileExtra request, ServerCallContext context)
         {
-            var extra = Mapper.ToDto(request.Extra);
+            var extra = request.Extra.ToDto();
             var code = request.BaseInfo.FileBase.Code;
 
             var result = await _service.SetExtraSettings(code, extra);
 
-            return Mapper.ToProto(result);
+            return result.ToProto();
         }
     }
 }

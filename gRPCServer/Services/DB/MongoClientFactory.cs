@@ -1,4 +1,4 @@
-﻿using gRPCContract.Utils;
+﻿using gRPCServer.Services.Utils;
 using MongoDB.Driver;
 
 namespace gRPCServer.Services.DB
