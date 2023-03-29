@@ -31,14 +31,15 @@ services:
       dockerfile: TempDocClient/Dockerfile
     container_name: grpcclient
     ports:
-    - 80
+    - 8989:80
     networks:
     - tempdoc
     environment:
-        TEMPDOC_HOST: grpcserver
-    depends_on:
-        grpcserver:
-            condition: service_healthy
+        TEMPDOC_HOST: http://grpcserver:81
+        # TEMPDOC_HOST: http://balancer:444
+    # depends_on:
+    #     balancer:
+    #         condition: service_healthy
     # healthcheck:
     #    test: curl --false http://grpcserver:80/swagger/index.html || exit
     #    interval: 10s

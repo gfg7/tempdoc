@@ -4,12 +4,17 @@ using WebContract.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddGrpcClient<TempDocSaver.TempDocSaverClient>(o=> {
+builder.Services.AddGrpcClient<TempDocSaver.TempDocSaverClient>(o =>
+{
     o.Address = new Uri(Environment.GetEnvironmentVariable("TEMPDOC_HOST"));
+}).ConfigureChannel(x=> {
+    x.UnsafeUseInsecureChannelCallCredentials = true;
 });
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IClientBucketManagement, TempDocSaverHandler>();
+
+// builder.Services.AddSignalRCore();
 
 var app = builder.Build();
 
@@ -27,6 +32,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+// app.MapHub<TempDocHub>("/");
 
 app.MapControllerRoute(
     name: "default",
