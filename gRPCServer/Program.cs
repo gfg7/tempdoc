@@ -1,3 +1,4 @@
+using System.Net;
 using gRPCServer.Intefaces.DB;
 using gRPCServer.Intefaces.Repository;
 using gRPCServer.Intefaces.Services;
@@ -11,6 +12,7 @@ using gRPCServer.Services.Repository;
 using gRPCServer.Services.Utils;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MongoDB.Driver;
 using Quartz;
 using WebContract.Interfaces;
@@ -106,6 +108,9 @@ builder.Services.AddQuartzHostedService(o=> {
 builder.WebHost.ConfigureKestrel(o =>
 {
     o.Limits.MaxRequestBodySize = null;
+    o.Listen(IPAddress.Any, 81, listenOptions => {
+        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
+    });
 });
 
 var app = builder.Build();
@@ -136,8 +141,9 @@ if (builder.Environment.IsDevelopment() || bool.Parse(Env.Get("SHOW_API")))
 
 app.MapHealthChecks("/health", new()
 {
-    AllowCachingResponses = false
-});
+    AllowCachingResponses = false,
+    ResultStatusCodes = null
+}).RequireHost("*:80");
 
 app.MapPost("/api/{bucket}/files", async (
     [FromRoute] string bucket,
@@ -167,7 +173,7 @@ app.MapGet("/api/{bucket}/{code}", async (
     }
 });
 
-app.MapGrpcService<TempDocSaverHandler>();
+app.MapGrpcService<TempDocSaverHandler>().RequireHost("*:81");
 
 app.UseOutputCache();
 
