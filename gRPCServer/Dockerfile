@@ -1,14 +1,14 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
+EXPOSE 81
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["gRPCServer/gRPCServer.csproj", "gRPCServer/"]
-COPY ["gRPCContract/gRPCContract.csproj", "gRPCContract/"]
+COPY ["WebContract/WebContract.csproj", "WebContract/"]
+COPY ["ProtoContract/*", "ProtoContract/"]
 RUN dotnet restore "gRPCServer/gRPCServer.csproj"
 COPY . .
 WORKDIR "/src/gRPCServer"
