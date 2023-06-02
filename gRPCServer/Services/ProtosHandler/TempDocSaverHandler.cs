@@ -69,9 +69,10 @@ namespace gRPCServer.Services.ProtosHandler
         public override async Task<FileInfo> SetExtraSettings(FileExtra request, ServerCallContext context)
         {
             var extra = request.Extra.ToDto();
+            var bucket = request.BaseInfo.BucketBase.Name;
             var code = request.BaseInfo.FileBase.Code;
 
-            var result = await _service.SetExtraSettings(code, extra);
+            var result = await _service.SetExtraSettings(bucket, code, extra);
 
             return result.ToProto();
         }

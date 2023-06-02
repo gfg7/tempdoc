@@ -90,7 +90,7 @@ namespace gRPCServer.Services.Management
             return await GetBucket(bucket);
         }
 
-        public async Task<StoredFileInfo> SetExtraSettings(string code, FileDtoRequest extra)
+        public async Task<StoredFileInfo> SetExtraSettings(string bucket, string code, FileDtoRequest extra)
         {
             CodeValidation(code);
 
